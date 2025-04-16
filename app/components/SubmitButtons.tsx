@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
-export function SubmitButton() {
+interface iAppProps {
+    text: string;
+}
+
+export function SubmitButton({ text } : iAppProps) {
     const {pending} = useFormStatus()
     return(
         <>
@@ -16,7 +20,9 @@ export function SubmitButton() {
                     Please Wait...
                 </Button>
             ) : (
-                <Button type="submit" className="w-full">Submit</Button>
+                <Button type="submit" className="w-full">
+                   {text}
+                </Button>
             )
          }
         </>

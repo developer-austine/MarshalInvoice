@@ -6,7 +6,12 @@ import Image from "next/image";
 import { DashboardLinks } from "../components/DashboardLinks";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, 
+        DropdownMenuContent,
+        DropdownMenuItem, 
+        DropdownMenuLabel, 
+        DropdownMenuSeparator, 
+        DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { signOut } from "../utils/auth";
 
 export default async function DashboardLayout({children}: {children:ReactNode}) {
