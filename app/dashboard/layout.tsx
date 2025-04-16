@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { requireUser } from "../utils/hooks";
 import { Link, Menu, User2 } from "lucide-react";
-import Logo from "@/public/logo (1).png"
+// import Logo from "@/public/logo.png"
 import Image from "next/image";
 import { DashboardLinks } from "../components/DashboardLinks";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -13,9 +13,29 @@ import { DropdownMenu,
         DropdownMenuSeparator, 
         DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { signOut } from "../utils/auth";
+import prisma from "../utils/db";
+import { redirect } from "next/navigation";
+
+async function getUser(userId: string) {
+    const data = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            firstName: true,
+            lastName: true,
+            address: true,
+        },
+    })
+
+    if(!data?.firstName || !data.lastName || !data.address) {
+        redirect("/onboarding")
+    }
+}
 
 export default async function DashboardLayout({children}: {children:ReactNode}) {
     const session = await requireUser();
+    const data = await getUser(session.user?.id as string);
     return(
         <>
            <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -26,7 +46,14 @@ export default async function DashboardLayout({children}: {children:ReactNode}) 
                         href="/" 
                         className="flex items-center gap-2"
                         >
-                            <Image src={Logo} alt="Logo" className="size-7" />
+                            <Image 
+                                src="/logo.png" 
+                                alt="Logo" 
+                                className="size-7"
+                                width={512}
+                                height={512}
+                                // fetchPriority={true}
+                                 />
                             <p className="text-2xl font-bold">
                                 Invoice<span className="text-blue-600">Marshal</span></p>
                         </Link>
