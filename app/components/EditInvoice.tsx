@@ -19,30 +19,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
-import { useActionState, useState } from "react";
 import { SubmitButton } from "./SubmitButtons";
-import { createInvoice } from "../actions";
+import { useActionState, useState } from "react";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { invoiceSchema } from "../utils/zodSchemas";
+import { createInvoice, editInvoice } from "../actions";
 import { formatCurrency } from "../utils/formatCurrency";
+import { Prisma } from "@prisma/client";
 
 interface iAppProps {
-  firstName: string;
-  lastName: string;
-  address: string;
-  email: string;
+  data: Prisma.InvoiceGetPayload<{}>;
 }
 
-export function CreateInvoice({
-  address,
-  email,
-  firstName,
-  lastName,
-}: iAppProps) {
-  const [lastResult, action] = useActionState(createInvoice, undefined);
+export function EditInvoice({ data }: iAppProps) {
+  const [lastResult, action] = useActionState(editInvoice, undefined);
   const [form, fields] = useForm({
     lastResult,
 
@@ -56,13 +48,12 @@ export function CreateInvoice({
     shouldRevalidate: "onInput",
   });
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [rate, setRate] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [selectedDate, setSelectedDate] = useState(data.date);
+  const [rate, setRate] = useState(data.invoiceItemRate.toString());
+  const [quantity, setQuantity] = useState(data.invoiceItemQuantity.toString());
+  const [currency, setCurrency] = useState(data.currency);
 
   const calcualteTotal = (Number(quantity) || 0) * (Number(rate) || 0);
-
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent className="p-6">
@@ -72,6 +63,7 @@ export function CreateInvoice({
             name={fields.date.name}
             value={selectedDate.toISOString()}
           />
+          <input type="hidden" name="id" value={data.id} />
 
           <input
             type="hidden"
@@ -85,7 +77,7 @@ export function CreateInvoice({
               <Input
                 name={fields.invoiceName.name}
                 key={fields.invoiceName.key}
-                defaultValue={fields.invoiceName.initialValue}
+                defaultValue={data.invoiceName}
                 placeholder="Test 123"
               />
             </div>
@@ -102,7 +94,7 @@ export function CreateInvoice({
                 <Input
                   name={fields.invoiceNumber.name}
                   key={fields.invoiceNumber.key}
-                  defaultValue={fields.invoiceNumber.initialValue}
+                  defaultValue={data.invoiceNumber}
                   className="rounded-l-none"
                   placeholder="5"
                 />
@@ -115,7 +107,7 @@ export function CreateInvoice({
             <div>
               <Label>Currency</Label>
               <Select
-                defaultValue="KES"
+                defaultValue="USD"
                 name={fields.currency.name}
                 key={fields.currency.key}
                 onValueChange={(value) => setCurrency(value)}
@@ -128,7 +120,6 @@ export function CreateInvoice({
                     United States Dollar -- USD
                   </SelectItem>
                   <SelectItem value="EUR">Euro -- EUR</SelectItem>
-                  <SelectItem value="KES">KES -- KES</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-red-500 text-sm">{fields.currency.errors}</p>
@@ -143,14 +134,14 @@ export function CreateInvoice({
                   name={fields.fromName.name}
                   key={fields.fromName.key}
                   placeholder="Your Name"
-                  defaultValue={firstName + " " + lastName}
+                  defaultValue={data.fromName}
                 />
                 <p className="text-red-500 text-sm">{fields.fromName.errors}</p>
                 <Input
                   placeholder="Your Email"
                   name={fields.fromEmail.name}
                   key={fields.fromEmail.key}
-                  defaultValue={email}
+                  defaultValue={data.fromEmail}
                 />
                 <p className="text-red-500 text-sm">
                   {fields.fromEmail.errors}
@@ -159,7 +150,7 @@ export function CreateInvoice({
                   placeholder="Your Address"
                   name={fields.fromAddress.name}
                   key={fields.fromAddress.key}
-                  defaultValue={address}
+                  defaultValue={data.fromAddress}
                 />
                 <p className="text-red-500 text-sm">
                   {fields.fromAddress.errors}
@@ -173,7 +164,7 @@ export function CreateInvoice({
                 <Input
                   name={fields.clientName.name}
                   key={fields.clientName.key}
-                  defaultValue={fields.clientName.initialValue}
+                  defaultValue={data.clientName}
                   placeholder="Client Name"
                 />
                 <p className="text-red-500 text-sm">
@@ -182,7 +173,7 @@ export function CreateInvoice({
                 <Input
                   name={fields.clientEmail.name}
                   key={fields.clientEmail.key}
-                  defaultValue={fields.clientEmail.initialValue}
+                  defaultValue={data.clientEmail}
                   placeholder="Client Email"
                 />
                 <p className="text-red-500 text-sm">
@@ -191,7 +182,7 @@ export function CreateInvoice({
                 <Input
                   name={fields.clientAddress.name}
                   key={fields.clientAddress.key}
-                  defaultValue={fields.clientAddress.initialValue}
+                  defaultValue={data.clientAddress}
                   placeholder="Client Address"
                 />
                 <p className="text-red-500 text-sm">
@@ -240,7 +231,7 @@ export function CreateInvoice({
               <Select
                 name={fields.dueDate.name}
                 key={fields.dueDate.key}
-                defaultValue={fields.dueDate.initialValue}
+                defaultValue={data.dueDate.toString()}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select due date" />
@@ -268,7 +259,7 @@ export function CreateInvoice({
                 <Textarea
                   name={fields.invoiceItemDescription.name}
                   key={fields.invoiceItemDescription.key}
-                  defaultValue={fields.invoiceItemDescription.initialValue}
+                  defaultValue={data.invoiceItemDescription}
                   placeholder="Item name & description"
                 />
                 <p className="text-red-500 text-sm">
@@ -341,7 +332,7 @@ export function CreateInvoice({
             <Textarea
               name={fields.note.name}
               key={fields.note.key}
-              defaultValue={fields.note.initialValue}
+              defaultValue={data.note ?? undefined}
               placeholder="Add your Note/s right here..."
             />
             <p className="text-red-500 text-sm">{fields.note.errors}</p>
@@ -349,7 +340,7 @@ export function CreateInvoice({
 
           <div className="flex items-center justify-end mt-6">
             <div>
-              <SubmitButton text="Send Invoice to Client" />
+              <SubmitButton text="Update Invoice" />
             </div>
           </div>
         </form>
