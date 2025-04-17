@@ -26,18 +26,18 @@ export function InvoiceActions({ id, status }: iAppProps) {
   const handleSendReminder = () => {
     toast.promise(
       fetch(`/api/email/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }),
-      {
-        loading: "Sending reminder email...",
-        success: "Reminder email sent successfully",
-        error: "Failed to send reminder email",
-      }
-    );
-  };
+      method: 'POST',
+      headers: {
+        'Content-Type': "application/json",
+      },
+    }),
+     {
+      loading: 'Sending reminder email...',
+      success: 'Reminder Email sent Successfully',
+      error: 'Failed to send reminder Email',
+    }
+   )
+  }
 
   return (
     <DropdownMenu>
