@@ -64,7 +64,7 @@ export async function DashboardBlocks() {
 
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-md">Total Invoices Isdued</CardTitle>
+                    <CardTitle className="text-sm font-md">Total Invoices Issued</CardTitle>
                     <Users className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
