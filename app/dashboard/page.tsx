@@ -8,6 +8,7 @@ import { requireUser } from "../utils/hooks"
 import { signOutAction } from "./actions"
 import { Skeleton } from "@/components/ui/skeleton"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from '@vercel/analytics/next';
 
 async function getData(userId: string) {
  const data = await prisma.invoice.findMany({
@@ -45,6 +46,7 @@ export default async function DashboardRoute() {
         </Suspense>
        )}
        <SpeedInsights />
+       <Analytics />
        </>
     )
 }
